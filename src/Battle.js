@@ -3,6 +3,8 @@ import Dice from "./Dice";
 export default class Battle {
 
   constructor(attackers, defenders) {
+    this.initialAttackers = attackers
+    this.initialDefenders = attackers
     this.attackers = attackers
     this.defenders = defenders
     this.battleLog = ''
@@ -15,8 +17,16 @@ export default class Battle {
       battleRound++
       this.log('------ Battle round: ' + battleRound)
       this.fightRound()
-   } while ((this.attackers > 0 && this.defenders > 0) || battleRound > 10)
-    return this.battleLog
+   } while ((this.attackers > 0 && this.defenders > 0) || battleRound > 50)
+    return {
+      log: this.battleLog,
+      stats: {
+        rounds: battleRound,
+        winner: (this.attackers > 0) ? 'attacker' : 'defender',
+        attackerCasualties: this.initialAttackers - this.attackers,
+        defenderCasualties: this.initialDefenders - this.defenders
+      }
+    }
   }
 
   fightRound() {
