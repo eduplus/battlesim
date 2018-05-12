@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Battle from "./Battle";
+import DiceValue from "./DiceValue";
 
 class App extends Component {
 
@@ -11,14 +12,32 @@ class App extends Component {
       log: '',
       attackers: 3,
       defenders: 1,
-      stats: null
+      stats: null,
+      dice: {
+        attacker: {
+          1: 'shield',
+          2: 'miss',
+          3: 'miss',
+          4: 'miss',
+          5: 'hit',
+          6: 'dhit'
+        },
+        defender: {
+          1: 'shield',
+          2: 'shield',
+          3: 'miss',
+          4: 'miss',
+          5: 'hit',
+          6: 'dhit'
+        }
+      }
     }
   }
 
   onPress = () => {
     console.log('fight!')
     this.setState({ stats: null })
-    const battle = new Battle(this.state.attackers, this.state.defenders)
+    const battle = new Battle(this.state.attackers, this.state.defenders, this.state.dice)
     const { log } = battle.battle()
     this.setState({ log })
   }
@@ -28,7 +47,7 @@ class App extends Component {
     this.setState({ log: '' })
     const results = []
     for (let i = 0; i < 100000; i++) {
-      const battle = new Battle(this.state.attackers, this.state.defenders)
+      const battle = new Battle(this.state.attackers, this.state.defenders, this.state.dice)
       const { stats } = battle.battle()
       results.push(stats)
     }
@@ -81,6 +100,18 @@ class App extends Component {
     return log
   }
 
+  onDiceChange = (dice, type, value) => {
+    this.setState((prevState) => ({
+      dice: {
+        ...prevState.dice,
+        [type]: {
+          ...prevState.dice[type],
+          [dice]: value
+        }
+      }
+    }))
+  }
+
   render() {
     return (
       <div className="App">
@@ -89,6 +120,21 @@ class App extends Component {
           <h1 className="App-title">Cuzco Battlesim</h1>
         </header>
         <p className="App-intro">
+          Attacker:
+          <DiceValue name={'1'} value={this.state.dice.attacker[1]} onChange={(event) => this.onDiceChange(1, 'attacker', event.target.value)}/>
+          <DiceValue name={'2'} value={this.state.dice.attacker[2]} onChange={(event) => this.onDiceChange(2, 'attacker', event.target.value)}/>
+          <DiceValue name={'3'} value={this.state.dice.attacker[3]} onChange={(event) => this.onDiceChange(3, 'attacker', event.target.value)}/>
+          <DiceValue name={'4'} value={this.state.dice.attacker[4]} onChange={(event) => this.onDiceChange(4, 'attacker', event.target.value)}/>
+          <DiceValue name={'5'} value={this.state.dice.attacker[5]} onChange={(event) => this.onDiceChange(5, 'attacker', event.target.value)}/>
+          <DiceValue name={'6'} value={this.state.dice.attacker[6]} onChange={(event) => this.onDiceChange(6, 'attacker', event.target.value)}/>
+          <br />
+          Defender:
+          <DiceValue name={'1'} value={this.state.dice.defender[1]} onChange={(event) => this.onDiceChange(1, 'defender', event.target.value)}/>
+          <DiceValue name={'2'} value={this.state.dice.defender[2]} onChange={(event) => this.onDiceChange(2, 'defender', event.target.value)}/>
+          <DiceValue name={'3'} value={this.state.dice.defender[3]} onChange={(event) => this.onDiceChange(3, 'defender', event.target.value)}/>
+          <DiceValue name={'4'} value={this.state.dice.defender[4]} onChange={(event) => this.onDiceChange(4, 'defender', event.target.value)}/>
+          <DiceValue name={'5'} value={this.state.dice.defender[5]} onChange={(event) => this.onDiceChange(5, 'defender', event.target.value)}/>
+          <DiceValue name={'6'} value={this.state.dice.defender[6]} onChange={(event) => this.onDiceChange(6, 'defender', event.target.value)}/>
         </p>
         Attackers: <input type="text" value={this.state.attackers} onChange={evt => this.setState({ attackers: evt.target.value })} />
         Defenders: <input type="text" value={this.state.defenders} onChange={evt => this.setState({ defenders: evt.target.value })} />

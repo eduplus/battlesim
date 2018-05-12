@@ -2,12 +2,13 @@ import Dice from "./Dice";
 
 export default class Battle {
 
-  constructor(attackers, defenders) {
-    this.initialAttackers = attackers
-    this.initialDefenders = attackers
-    this.attackers = attackers
-    this.defenders = defenders
+  constructor(attackers, defenders, diceValues) {
+    this.initialAttackers = parseInt(attackers)
+    this.initialDefenders = parseInt(defenders)
+    this.attackers = parseInt(attackers)
+    this.defenders = parseInt(defenders)
     this.battleLog = ''
+    this.diceValues = diceValues
   }
 
   battle() {
@@ -23,15 +24,15 @@ export default class Battle {
       stats: {
         rounds: battleRound,
         winner: (this.attackers > 0) ? 'attacker' : 'defender',
-        attackerCasualties: this.initialAttackers - this.attackers,
-        defenderCasualties: this.initialDefenders - this.defenders
+        attackerCasualties: (this.initialAttackers - this.attackers > 0) ? this.initialAttackers - this.attackers : 0,
+        defenderCasualties: (this.initialDefenders - this.defenders > 0) ? this.initialDefenders - this.defenders : 0
       }
     }
   }
 
   fightRound() {
     const attackerResults = this.getRoundResult(this.attackers, 'attacker')
-    const defenderResults = this.getRoundResult(this.defenders, 'defender')
+    const defenderResults = this.getRoundResult(this.defenders + 1, 'defender')
     this.log('results for attacker: ')
     this.getLogForFightResult(attackerResults)
     this.log('results for defender: ')
@@ -50,7 +51,7 @@ export default class Battle {
       miss: 0,
       shield: 0
     }
-    const dice = new Dice(type)
+    const dice = new Dice(this.diceValues[type])
     for (let i = 0; i < count; i++) {
       const roll = dice.roll()
       results[roll] = results[roll] + 1
