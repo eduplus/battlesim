@@ -23,7 +23,7 @@ export default class Battle {
       log: this.battleLog,
       stats: {
         rounds: battleRound,
-        winner: (this.attackers > 0) ? 'attacker' : 'defender',
+        winner: (this.attackers > 0) ? 'attacker' : (this.defenders > 0) ? 'defender' : 'tie',
         attackerCasualties: (this.initialAttackers - this.attackers > 0) ? this.initialAttackers - this.attackers : 0,
         defenderCasualties: (this.initialDefenders - this.defenders > 0) ? this.initialDefenders - this.defenders : 0
       }
@@ -32,7 +32,7 @@ export default class Battle {
 
   fightRound() {
     const attackerResults = this.getRoundResult(this.attackers, 'attacker')
-    const defenderResults = this.getRoundResult(this.defenders + 1, 'defender')
+    const defenderResults = this.getRoundResult(this.defenders, 'defender')
     this.log('results for attacker: ')
     this.getLogForFightResult(attackerResults)
     this.log('results for defender: ')

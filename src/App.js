@@ -51,10 +51,11 @@ class App extends Component {
       const { stats } = battle.battle()
       results.push(stats)
     }
-    const { attackWin, defendWin, rounds, attackerCasualties, defenderCasualties } = results.reduce((acc, battle) => {
+    const { attackWin, defendWin, tieWin, rounds, attackerCasualties, defenderCasualties } = results.reduce((acc, battle) => {
       const res = {
         attackWin: (battle.winner === 'attacker') ? acc.attackWin + 1 : acc.attackWin,
         defendWin: (battle.winner === 'defender') ? acc.defendWin + 1 : acc.defendWin,
+        tieWin: (battle.winner === 'tie') ? acc.tieWin + 1 : acc.tieWin,
         rounds: acc.rounds,
         attackerCasualties: acc.attackerCasualties,
         defenderCasualties: acc.defenderCasualties
@@ -66,6 +67,7 @@ class App extends Component {
     }, {
       attackWin: 0,
       defendWin: 0,
+      tieWin: 0,
       rounds: {},
       attackerCasualties: {},
       defenderCasualties: {}
@@ -75,7 +77,7 @@ class App extends Component {
     Object.keys(defenderCasualties).map((key) => { defenderCasualties[key] = ((defenderCasualties[key] / results.length) * 100).toFixed(2) })
     this.setState({
       stats: {
-        wins: { attacker: (attackWin / results.length * 100).toFixed(2), defender: (defendWin / results.length * 100).toFixed(2) },
+        wins: { attacker: (attackWin / results.length * 100).toFixed(2), defender: (defendWin / results.length * 100).toFixed(2), tie: (tieWin / results.length * 100).toFixed(2) },
         rounds,
         attackerCasualties,
         defenderCasualties
@@ -84,7 +86,8 @@ class App extends Component {
 
   logStats = () => {
     let log =  `Attacker won ${this.state.stats.wins.attacker}% of the battles\n` +
-      `Defender won ${this.state.stats.wins.defender}% of the battles\n`
+      `Defender won ${this.state.stats.wins.defender}% of the battles\n` +
+        `Ties (mutual destructions) ${this.state.stats.wins.tie}% of the battles\n`
     log += `------------------ ROUNDS: ------------------------\n`
     Object.keys(this.state.stats.rounds).forEach((key) => {
       log += `rounds ${key}: ${this.state.stats.rounds[key]} %\n`
