@@ -51,24 +51,33 @@ class App extends Component {
       const { stats } = battle.battle()
       results.push(stats)
     }
-    const { attackWin, defendWin, tieWin, rounds, attackerCasualties, defenderCasualties } = results.reduce((acc, battle) => {
+    const { attackWin, defendWin, tieWin, rounds, attackerCasualties, defenderCasualties, attackWinCasualties, defendWinCasualties } = results.reduce((acc, battle) => {
       const res = {
         attackWin: (battle.winner === 'attacker') ? acc.attackWin + 1 : acc.attackWin,
         defendWin: (battle.winner === 'defender') ? acc.defendWin + 1 : acc.defendWin,
         tieWin: (battle.winner === 'tie') ? acc.tieWin + 1 : acc.tieWin,
         rounds: acc.rounds,
         attackerCasualties: acc.attackerCasualties,
-        defenderCasualties: acc.defenderCasualties
+        defenderCasualties: acc.defenderCasualties,
+        attackWinCasualties: acc.attackWinCasualties,
+        defendWinCasualties: acc.defendWinCasualties
       }
       res.rounds[battle.rounds] = (acc.rounds[battle.rounds]) ? acc.rounds[battle.rounds] + 1 : 1
       res.attackerCasualties[battle.attackerCasualties] = (acc.attackerCasualties[battle.attackerCasualties]) ? acc.attackerCasualties[battle.attackerCasualties] + 1 : 1
       res.defenderCasualties[battle.defenderCasualties] = (acc.defenderCasualties[battle.defenderCasualties]) ? acc.defenderCasualties[battle.defenderCasualties] + 1 : 1
+      if (battle.winner === 'attacker') {
+        res.attackWinCasualties[battle.attackerCasualties] = (acc.attackWinCasualties[battle.attackerCasualties]) ? acc.attackWinCasualties[battle.attackerCasualties] + 1 : 1
+      } else if (battle.winner === 'defender') {
+        res.defendWinCasualties[battle.defenderCasualties] = (acc.defendWinCasualties[battle.defenderCasualties]) ? acc.defendWinCasualties[battle.defenderCasualties] + 1 : 1
+      }
       return res
     }, {
       attackWin: 0,
       defendWin: 0,
       tieWin: 0,
       rounds: {},
+      attackWinCasualties: {},
+      defendWinCasualties: {},
       attackerCasualties: {},
       defenderCasualties: {}
     })
@@ -77,17 +86,27 @@ class App extends Component {
     Object.keys(defenderCasualties).map((key) => { defenderCasualties[key] = ((defenderCasualties[key] / results.length) * 100).toFixed(2) })
     this.setState({
       stats: {
-        wins: { attacker: (attackWin / results.length * 100).toFixed(2), defender: (defendWin / results.length * 100).toFixed(2), tie: (tieWin / results.length * 100).toFixed(2) },
+        battles: results.length,
+        wins: { attacker: attackWin, defender: defendWin, tie: (tieWin / results.length * 100).toFixed(2) },
         rounds,
         attackerCasualties,
-        defenderCasualties
+        defenderCasualties,
+        attackWinCasualties,
+        defendWinCasualties
       }})
   }
 
   logStats = () => {
-    let log =  `Attacker won ${this.state.stats.wins.attacker}% of the battles\n` +
-      `Defender won ${this.state.stats.wins.defender}% of the battles\n` +
-        `Ties (mutual destructions) ${this.state.stats.wins.tie}% of the battles\n`
+    const { attackWinCasualties, defendWinCasualties, battles } = this.state.stats
+    let log =  `Attacker won ${(this.state.stats.wins.attacker / battles * 100).toFixed(2)}% of the battles\n`
+    Object.keys(attackWinCasualties).forEach((key) => {
+      log += `(with ${key} casualties: ${((attackWinCasualties[key] / this.state.stats.wins.attacker) * 100).toFixed(2)}%)\n`
+    })
+    log += `Defender won ${(this.state.stats.wins.defender / battles * 100).toFixed(2)}% of the battles\n`
+    Object.keys(defendWinCasualties).forEach((key) => {
+      log += `(with ${key} casualties:  ${((defendWinCasualties[key] / this.state.stats.wins.defender) * 100).toFixed(2)}%)\n`
+    })
+    log += `Ties (mutual destructions) ${this.state.stats.wins.tie}% of the battles\n`
     log += `------------------ ROUNDS: ------------------------\n`
     Object.keys(this.state.stats.rounds).forEach((key) => {
       log += `rounds ${key}: ${this.state.stats.rounds[key]} %\n`
